@@ -1,0 +1,14 @@
+#!/bin/bash
+
+read -p "User: " _USER
+read -p "Password: " -s _PASSWORD
+echo 
+
+ncftp -u $_USER -p $_PASSWORD migasfree.org<<FINFTP
+       binary
+       prompt
+       lcd /pub/
+       cd /httpdocs/pub/
+       mput -R *
+       bye
+FINFTP

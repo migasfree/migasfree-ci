@@ -1,0 +1,38 @@
+#!/bin/bash
+
+if [ -z $_GIT ] 
+then
+    echo "Enviroment variable _GIT not defined. Assuming *latest* release to build migasfree suite"
+    _VOLUME_GIT=
+else
+    _VOLUME_GIT="-v $_GIT:/git"
+fi
+
+_BUILD_FROM="ubuntu:precise"
+_BUILD_DISTRO=$(echo "$_BUILD_FROM" | awk -F: '{print $2}')
+
+_PATH_LOG=logs
+_RESUME_LOG=$_PATH_LOG/build-resume.log
+
+mkdir -p $_PATH_LOG
+rm $_PATH_LOG/build-*.log
+echo "" > $_RESUME_LOG
+echo "BUILD RESUME LOG" >> $_RESUME_LOG
+echo "================" >> $_RESUME_LOG
+echo "" >> $_RESUME_LOG
+
+# Build
+echo -n "$_BUILD_DISTRO: " >> $_RESUME_LOG
+_BUILD_LOG=$_PATH_LOG/build-$_BUILD_DISTRO.log
+echo -n "" > $_BUILD_LOG
+cat Dockerfile.build | sed "s/\$_FROM/$_BUILD_FROM/" > .Dock
+docker build -t ci-build:$_BUILD_DISTRO -f .Dock . | tee -a $_BUILD_LOG
+docker run -ti --rm --privileged -v /pub:/pub $_VOLUME_GIT -v /var/lib/migasfree.org:/var/lib/migasfree.org ci-build:$_BUILD_DISTRO ./entrypoint.sh | tee -a $_BUILD_LOG
+if [ ${PIPESTATUS[0]} = 0 ] ; then
+    echo "OK" >> $_RESUME_LOG
+else
+    echo "ERROR. More info in $_BUILD_LOG" >>  $_RESUME_LOG
+fi
+
+cat $_RESUME_LOG
+echo ""

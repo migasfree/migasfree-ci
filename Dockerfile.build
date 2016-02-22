@@ -1,0 +1,18 @@
+FROM $_FROM
+
+ENV TERM=xterm \
+    DEBIAN_FRONTEND=noninteractive \
+    USER=root \
+    LANG=en_US.UTF-8
+
+RUN apt-get update && \
+    apt-get -y --no-install-recommends install apt-utils && \
+    apt-get -y --no-install-recommends install locales && \
+    localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 && \
+    apt-get -y --no-install-recommends install python-all python-pip git tar wget && \
+    apt-get -y  install debhelper python-stdeb && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY default/build_packages.sh /build_packages.sh
+COPY default/entrypoint-build.sh /entrypoint.sh

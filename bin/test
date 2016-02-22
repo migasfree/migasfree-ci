@@ -1,0 +1,37 @@
+#!/bin/bash
+
+if [ -z $_TEST_FROM ] ; then
+    _TEST_FROM="ubuntu:precise ubuntu:trusty ubuntu:xenial debian:wheezy debian:jessie debian:stretch"
+fi
+
+_PATH_LOG=logs
+_RESUME_LOG=$_PATH_LOG/test-resume.log
+
+mkdir -p $_PATH_LOG
+rm $_PATH_LOG/test-*.log
+echo "" > $_LOG
+echo "TEST RESUME LOG" >> $_RESUME_LOG
+echo "===============" >> $_RESUME_LOG
+echo "" >> $_RESUME_LOG
+
+
+# Test
+for _FROM in $_TEST_FROM
+do
+    _DISTRO=$(echo "$_FROM" | awk -F: '{print $2}')
+    _TEST_LOG=$_PATH_LOG/test-$_DISTRO.log
+    echo -n "$_FROM ... " >> $_RESUME_LOG
+    echo -n "" > $_TEST_LOG
+    cat Dockerfile.test | sed "s/\$_FROM/$_FROM/" > .Dock
+    docker build -t ci-test:$_DISTRO -f .Dock . | tee -a $_TEST_LOG
+    docker run -ti --rm --privileged -p 82:80 -v /pub:/pub ci-test:$_DISTRO ./entrypoint.sh | tee -a $_TEST_LOG
+    if [ ${PIPESTATUS[0]} = 0 ] ; then
+        echo "OK" >> $_RESUME_LOG
+    else
+        echo "ERROR. More info in $_TEST_LOG" >>  $_RESUME_LOG
+    fi
+    echo "" >> $_RESUME_LOG
+done
+
+cat $_RESUME_LOG
+echo ""
