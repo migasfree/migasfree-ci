@@ -75,14 +75,14 @@ function build_dependences()
 
     cd $_TARGET_PATH/dists/$_VERSION/PKGS/
 
-    # migasfree_4.9-1 requery packages
-    build_pkg_with_pip yourlabs django-autocomplete-light 2.2.10
+    # migasfree_4.10-1 requery packages
+    build_pkg_with_pip yourlabs django-autocomplete-light 3.1.1
     build_pkg crucialfelix django-ajax-selects 1.4.2
-    build_pkg django django 1.9.2
+    build_pkg django django 1.9.3
     build_pkg dyve django-bootstrap3 6.2.2
     build_pkg django-admin-bootstrapped django-admin-bootstrapped 2.5.7
     build_pkg django-import-export django-import-export 0.4.0
-    build_pkg kelp404 six 1.9.0
+    build_pkg kelp404 six 1.10.0
     build_pkg_with_pip kennethreitz tablib 0.9.11
 
 

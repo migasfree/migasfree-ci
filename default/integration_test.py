@@ -57,10 +57,10 @@ class _20_MigasfreeUpload(unittest.TestCase):
 
     def setUp(self):
         migas_version = get_mfc_version()
-        cmd = """          
-            wget -O - http://migasfree.org/pub/gpg_key | apt-key add - 
-            echo "deb http://migasfree.org/pub wheezy PKGS" > /etc/apt/sources.list.d/migasfree.list 
-            apt-get update 
+        cmd = """
+            wget -O - http://migasfree.org/pub/gpg_key | apt-key add -
+            echo "deb http://migasfree.org/pub wheezy PKGS" > /etc/apt/sources.list.d/migasfree.list
+            apt-get update
             apt-get download migasfree-launcher
             _LAUNCHER=$(ls migasfree-launcher*.deb)
             sed -i "s/#User     =/User=packager/g" /etc/migasfree.conf
@@ -70,8 +70,8 @@ class _20_MigasfreeUpload(unittest.TestCase):
             migasfree-upload -f "$_LAUNCHER"
             rm "$_LAUNCHER"
            """
-           
-        os.system(cmd % migas_version)           
+
+        os.system(cmd % migas_version)
 
         cmd = """
             sed -i "s/#User     =/User=packager/g" /etc/migasfree.conf
@@ -79,8 +79,8 @@ class _20_MigasfreeUpload(unittest.TestCase):
             sed -i "s/#Version  =/Version=%s/g" /etc/migasfree.conf
             sed -i "s/#Store    =/Store=org/g" /etc/migasfree.conf
             migasfree-upload -f /ci/dists/*/PKGS/migasfree-launcher_*_all.deb
-        """ 
-           
+        """
+
         os.system(cmd % migas_version)
 
     def test_upload_file(self):
@@ -114,13 +114,12 @@ class _30_CreateRepository(unittest.TestCase):
         r.packages.add(1)
         r.attributes.add(1)
         r.save()
-        if migasfree.__version__ >= "4.2":
-            create_physical_repository({}, r, [1])
-        else:
-            create_physical_repository(r, [1])
+
+        create_physical_repository({}, r, [1]) # if migasfree.__version__ < "4.2": -> create_physical_repository(r, [1])
+
         self.repo = r
 
-        # Cambiamos propietario porque lo hemos creado como root 
+        # Cambiamos propietario porque lo hemos creado como root
         os.system("_USER=$(ls -la %(repo)s |grep %(version)s |cut -d ' ' -f 3) ;chown -R $_USER %(repo)s" % {"repo": settings.MIGASFREE_REPO_DIR, "version": r.version.name})
 
     def test_exist_pkg(self):
@@ -182,5 +181,5 @@ class _90_MigasfreeLabel(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-    
-    
+
+
