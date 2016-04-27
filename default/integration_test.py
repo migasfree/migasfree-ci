@@ -114,9 +114,10 @@ class _30_CreateRepository(unittest.TestCase):
         r.packages.add(1)
         r.attributes.add(1)
         r.save()
-
-        create_physical_repository({}, r, [1]) # if migasfree.__version__ < "4.2": -> create_physical_repository(r, [1])
-
+        if  len(migasfree.__version__) == 4 or migasfree.__version__ >= "4.2":
+            create_physical_repository({}, r, [1])
+        else:
+            create_physical_repository(r, [1])
         self.repo = r
 
         # Cambiamos propietario porque lo hemos creado como root
