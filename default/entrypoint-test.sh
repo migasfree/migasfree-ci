@@ -11,4 +11,15 @@ apt-get update
 apt-get -y install --no-install-recommends migasfree-client
 apt-get -y install --no-install-recommends migasfree-server
 
+cat > /etc/migasfree.conf <<EOF
+[client]
+Version=CI-TEST
+
+[packager]
+User=packager
+Password=packager
+Version=CI-TEST
+Store=org
+EOF
+
 DJANGO_SETTINGS_MODULE=migasfree.settings.production python /integration_test.py
