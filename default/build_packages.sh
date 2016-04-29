@@ -116,6 +116,7 @@ function build_migasfree_suite()
     do
         if [ -d /git/$_PKG ]
         then # from local
+            rm -rf /git/$_PKG/deb_dist || :
             cd /git/$_PKG/bin
             ./create-package
             cd ..
@@ -126,12 +127,8 @@ function build_migasfree_suite()
         fi
     done
 
-    # TODO build_pkg migasfree migasfree-launcher latest  (https://github.com/migasfree/migasfree-launcher/issues/25)
     cd $_TARGET_PATH/dists/$_VERSION/PKGS/
-    if ! [ -f migasfree-launcher_1.11-1_all.deb ]
-    then
-        wget http://www.migasfree.org/repo/dists/Ubuntu14/PKGS/migasfree-launcher_1.11-1_all.deb
-    fi
+    build_pkg migasfree "migasfree-launcher" latest
 
 }
 
@@ -211,28 +208,28 @@ EOF
     chmod 444 $_TARGET_PATH/gpg_key
 
     rm -rf $_TARGET_PATH/.cache ||:
-    
+
     # Install Server Script
     cat > $_TARGET_PATH/install-server <<EOF
-# To install migasfree-server execute: 
+# To install migasfree-server execute:
 #    wget -O - http://migasfree.org/pub/install-server | bash
 
-wget -O - http://migasfree.org/pub/gpg_key | apt-key add - 
-echo "deb http://migasfree.org/pub wheezy PKGS" > /etc/apt/sources.list.d/migasfree.list 
+wget -O - http://migasfree.org/pub/gpg_key | apt-key add -
+echo "deb http://migasfree.org/pub wheezy PKGS" > /etc/apt/sources.list.d/migasfree.list
 apt-get update
 apt-get -y install --no-install-recommends migasfree-server
 EOF
-    
+
     # Install Client Script
     cat > $_TARGET_PATH/install-client <<EOF
-# To install migasfree-client execute: 
+# To install migasfree-client execute:
 #    wget -O - http://migasfree.org/pub/install-client | bash
 
-wget -O - http://migasfree.org/pub/gpg_key | apt-key add - 
-echo "deb http://migasfree.org/pub wheezy PKGS" > /etc/apt/sources.list.d/migasfree.list 
+wget -O - http://migasfree.org/pub/gpg_key | apt-key add -
+echo "deb http://migasfree.org/pub wheezy PKGS" > /etc/apt/sources.list.d/migasfree.list
 apt-get update
 apt-get -y install --no-install-recommends migasfree-client
 EOF
-    
-    
+
+
 }
