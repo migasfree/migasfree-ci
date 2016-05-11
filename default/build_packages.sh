@@ -10,6 +10,7 @@ function build_pkg_with_pip()
     local _USER=$1
     local _REPO=$2
     local _RELEASE=${3:-latest} # master
+    local _CFG="$4"
 
     if ! [ -f /pub/dists/$_VERSION/PKGS/python-${_REPO}_$_RELEASE*_all.deb ]
     then
@@ -19,6 +20,12 @@ function build_pkg_with_pip()
         cd  $_REPO-$_RELEASE
         if [ -f setup.py ]
         then
+
+            if ! [ -z "$_CFG" ]
+            then
+                printf "$_CFG" > stdeb.cfg
+            fi
+
             python setup.py --command-packages=stdeb.command bdist_deb
         else
             /usr/bin/debuild --no-tgz-check -us -uc -b
@@ -37,6 +44,7 @@ function build_pkg()
     local _USER=$1
     local _REPO=$2
     local _RELEASE=${3:-latest} # master
+    local _CFG="$4"
 
     if ! [ -f /pub/dists/$_VERSION/PKGS/python-${_REPO}_${_RELEASE}-*_all.deb ]
     then
@@ -53,6 +61,12 @@ function build_pkg()
         else
             if [ -f setup.py ]
             then
+
+                if ! [ -z "$_CFG" ]
+                then
+                    printf "$_CFG" > stdeb.cfg
+                fi
+
                 python setup.py --command-packages=stdeb.command bdist_deb
             else
                 /usr/bin/debuild --no-tgz-check -us -uc -b
@@ -75,16 +89,20 @@ function build_dependences()
 
     cd $_TARGET_PATH/dists/$_VERSION/PKGS/
 
-    # migasfree_4.10-1 requery packages
+    # migasfree_4.11-1 requery packages
     build_pkg_with_pip yourlabs django-autocomplete-light 3.1.1
     build_pkg crucialfelix django-ajax-selects 1.4.2
-    build_pkg django django 1.9.3
+    build_pkg django django 1.9.6
     build_pkg dyve django-bootstrap3 6.2.2
     build_pkg django-admin-bootstrapped django-admin-bootstrapped 2.5.7
     build_pkg django-import-export django-import-export 0.4.0
     build_pkg kelp404 six 1.10.0
     build_pkg_with_pip kennethreitz tablib 0.9.11
 
+    build_pkg tomchristie django-rest-framework 3.3.3
+    build_pkg philipn django-rest-framework-filters 0.8.0
+    build_pkg marcgibbons django-rest-swagger 0.3.6
+    build_pkg_with_pip carltongibson django-filter 0.13.0 '[DEFAULT]\nProvides: django-filter\n'
 
 
     # python-diff-match-patch requerido por python-django-import-export
