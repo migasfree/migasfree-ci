@@ -78,15 +78,6 @@ rm "$_LAUNCHER"
 """
         os.system(cmd % migas_version)
 
-        cmd = """
-sed -i "s/#User     =/User=packager/g" /etc/migasfree.conf
-sed -i "s/#Password =/Password=packager/g" /etc/migasfree.conf
-sed -i "s/#Version  =/Version=%s/g" /etc/migasfree.conf
-sed -i "s/#Store    =/Store=org/g" /etc/migasfree.conf
-migasfree-upload -f /ci/dists/*/PKGS/migasfree-launcher_*_all.deb
-"""
-        os.system(cmd % migas_version)
-
     def test_upload_file(self):
         pkg = Package.objects.get(pk=1)
         pkg_file = os.path.join(
