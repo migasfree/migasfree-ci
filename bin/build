@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -z $_GIT ] 
+if [ -z $_GIT ]
 then
     echo "Enviroment variable _GIT not defined. Assuming *latest* release to build migasfree suite"
     _VOLUME_GIT=
@@ -33,6 +33,15 @@ if [ ${PIPESTATUS[0]} = 0 ] ; then
 else
     echo "ERROR. More info in $_BUILD_LOG" >>  $_RESUME_LOG
 fi
+
+
+# Rebuild docker image: migafsree-server:master
+cd ../migasfree-docker/images/server
+echo -e "master" > VERSION
+make build
+echo -e "latest" > VERSION
+cd -
+
 
 cat $_RESUME_LOG
 echo ""

@@ -1,8 +1,5 @@
 #!/bin/bash
 
-#wget -O - http://migasfree.org/pub/gpg_key | apt-key add -
-#echo "deb http://migasfree.org/pub wheezy PKGS" > /etc/apt/sources.list.d/local.list
-
 apt-key add /pub/gpg_key
 echo "deb file:///pub wheezy PKGS" > /etc/apt/sources.list.d/local.list
 
@@ -22,4 +19,4 @@ Version=CI-TEST
 Store=org
 EOF
 
-DJANGO_SETTINGS_MODULE=migasfree.settings.production python /integration_test.py
+DJANGO_SETTINGS_MODULE=migasfree.settings.production python /run-test.py

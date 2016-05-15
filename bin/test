@@ -9,7 +9,7 @@ _RESUME_LOG=$_PATH_LOG/test-resume.log
 
 mkdir -p $_PATH_LOG
 rm $_PATH_LOG/test-*.log
-echo "" > $_LOG
+echo "" > $_RESUME_LOG
 echo "TEST RESUME LOG" >> $_RESUME_LOG
 echo "===============" >> $_RESUME_LOG
 echo "" >> $_RESUME_LOG
@@ -24,7 +24,7 @@ do
     echo -n "" > $_TEST_LOG
     cat Dockerfile.test | sed "s/\$_FROM/$_FROM/" > .Dock
     docker build -t ci-test:$_DISTRO -f .Dock . | tee -a $_TEST_LOG
-    docker run -ti --rm --privileged -p 82:80 -v /pub:/pub ci-test:$_DISTRO ./entrypoint.sh | tee -a $_TEST_LOG
+    docker run -ti --rm --privileged -p 82:80 -v /pub:/pub ci-test:$_DISTRO ./entrypoint-test.sh | tee -a $_TEST_LOG
     if [ ${PIPESTATUS[0]} = 0 ] ; then
         echo "OK" >> $_RESUME_LOG
     else

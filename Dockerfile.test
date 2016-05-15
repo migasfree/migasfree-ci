@@ -15,8 +15,9 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY default/entrypoint-test.sh /entrypoint.sh
+COPY default/entrypoint-test.sh /entrypoint-test.sh
+COPY default/entrypoint-test-docker.sh /entrypoint-test-docker.sh
 
 COPY default/integration_test.py /integration_test.py
 
-EXPOSE 80 5432
+#EXPOSE 80 5432
