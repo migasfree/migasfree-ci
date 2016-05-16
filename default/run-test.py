@@ -130,15 +130,6 @@ class _10_Integrity(TokenApi):
     Test Autoregister computer
     """
 
-    def test_000_conf(self):
-        cmd = """
-sed -i "s/#User     =/User=packager/g" /etc/migasfree.conf
-sed -i "s/#Password =/Password=packager/g" /etc/migasfree.conf
-sed -i "s/#Version  =/Version=%s/g" /etc/migasfree.conf
-sed -i "s/#Store    =/Store=org/g" /etc/migasfree.conf
-"""
-        self.check_equal(os.system(cmd % "TESTCASE"), 0)
-
     def test_010_migasfree_update(self):
         cmd = "migasfree -u"
         self.check_equal(os.system(cmd), 0)

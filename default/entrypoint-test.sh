@@ -10,12 +10,12 @@ apt-get -y install --no-install-recommends migasfree-server
 
 cat > /etc/migasfree.conf <<EOF
 [client]
-Version=CI-TEST
+Version=TESTCASE
 
 [packager]
 User=packager
 Password=packager
-Version=CI-TEST
+Version=TESTCASE
 Store=org
 EOF
 
