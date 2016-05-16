@@ -145,8 +145,16 @@ function build_migasfree_suite()
         fi
     done
 
-    cd $_TARGET_PATH/dists/$_VERSION/PKGS/
-    build_pkg migasfree "migasfree-launcher" latest
+    if [ -d /git/migasfree-launcher ]
+    then
+        cd /git/migasfree-launcher/
+        python setup.py --command-packages=stdeb.command bdist_deb
+        cp deb_dist/*_all.deb /pub/dists/$_VERSION/PKGS
+        rm -rf deb_dist/*_all.deb
+    else
+        cd $_TARGET_PATH/dists/$_VERSION/PKGS/
+        build_pkg migasfree "migasfree-launcher" latest
+    fi
 
 }
 
