@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-# export DJANGO_SETTINGS_MODULE='migasfree.settings.production'
-
 import unittest
 
 import sys
@@ -23,6 +21,7 @@ from migasfree_client.utils import (
     get_config,
     get_hardware_uuid,
     get_mfc_computer_name,
+    get_mfc_version
 )
 
 from migasfree_client.network import get_first_mac
@@ -32,10 +31,15 @@ from migasfree_client import settings as client_settings
 
 class TokenApi(unittest.TestCase):
 
+    def __init__(self, *args, **kwargs):
+        self.user = "admin"
+        self.password = "admin"
+        super(TokenApi,self).__init__(*args, **kwargs)
+
     def setUp(self):
         config = get_config(client_settings.CONF_FILE, 'client')
         host = config.get('server', 'localhost')
-        data = json.dumps({"username": "admin", "password": "admin"})
+        data = json.dumps({"username": self.user, "password": self.password})
         self.connection = httplib.HTTPConnection(host)
         headers = {"Content-type": "application/json"}
         self.connection.request('POST', '/token-auth/', data, headers)
@@ -63,37 +67,56 @@ class TokenApi(unittest.TestCase):
         """
         return template % {"message": message}
 
-    def request(self, method, model, data):
+    def request(self, method, model, data={}, params={}):
         data = json.dumps(data)
+        if params:
+            params = '?' + urllib.urlencode(params)
+        else:
+            params = ''
         self.connection.request(
             method,
-            '/api/v1/token/%s/' % model,
+            '/api/v1/token/%s/%s' % (model, params),
             data,
             self.headers
         )
         response = self.connection.getresponse()
-        status = response.status
-        body = response.read()
-        return (status, body)
+        self.status = response.status
+        self.body = response.read()
 
-    def check_status_ok(self, status, body):
+    def check_status_ok(self):
         self.assertTrue(
-            status == httplib.OK,
+            self.status == httplib.OK,
             self.info_stack("Status %s != %s (OK). Body: %s" % (
-                status, httplib.OK,
-                body
+                self.status, httplib.OK,
+                self.body
                 )
             )
         )
 
-    def check_status_created(self, status, body):
+    def check_status_created(self):
         self.assertTrue(
-            status == httplib.CREATED,
+            self.status == httplib.CREATED,
             self.info_stack("Status %s != %s (CREATED). Body: %s" % (
-                status, httplib.CREATED,
-                body
+                self.status, httplib.CREATED,
+                self.body
                 )
             )
+        )
+
+    def check_status_forbidden(self):
+        self.assertTrue(
+            self.status == httplib.FORBIDDEN,
+            self.info_stack("Status %s != %s (FORBIDDEN). Body: %s" % (
+                self.status, httplib.FORBIDDEN,
+                self.body
+                )
+            )
+        )
+
+    def check_true(self, value1):
+        self.assertTrue(
+            value1,
+            self.info_stack("Not True")
         )
 
     def check_in(self, value1, value2):
@@ -109,20 +132,23 @@ class TokenApi(unittest.TestCase):
             self.info_stack("%s != %s" % (value1, value2))
         )
 
-    def check_field_in(self, body, field, value1):
-        value2 = json.loads(body)["results"][0][field]
+    def check_field_in(self, field, value1):
+        value2 = json.loads(self.body)[field]
         self.assertTrue(
             value1 in value2,
             self.info_stack("%s is not in %s" % (value1, value2))
         )
 
-    def check_field_equal(self, body, field, value1):
-        value2 = json.loads(body)["results"][0][field]
+    def check_field_equal(self, field, value1):
+        value2 = json.loads(self.body)[field]
         self.assertEqual(
             value1,
             value2,
             self.info_stack("%s != %s" % (value1, value2))
         )
+
+    def count(self):
+        return  json.loads(self.body)["count"]
 
 
 class _10_Integrity(TokenApi):
@@ -152,11 +178,12 @@ rm $_LAUNCHER
             "version": 1,
             "date": str(datetime.datetime.now().date()),
             "toinstall": 'migasfree-launcher',
+            "toremove": '',
             "packages": [1],
             "attributes": [1],
         }
-        status, body = self.request('POST', 'repositories', data)
-        self.check_status_created(status, body)
+        self.request('POST', 'repositories', data)
+        self.check_status_created()
 
     def test_040_mandatory_install(self):
         cmd = """
@@ -178,31 +205,108 @@ rm $_LAUNCHER
         self.check_in(self.uuid, self.label)
 
 
-class _20_Unit(TokenApi):
+class _20_check_integrity_data(TokenApi):
+
+    def test_010_check_platform(self):
+        self.request('GET', 'platforms/%s/' % 1)
+        self.check_status_ok()
+        self.check_field_equal("name", "Linux")
+
+    def test_020_check_version(self):
+        self.request('GET', 'versions/%s/' % 1)
+        self.check_status_ok()
+        self.check_field_equal("name", get_mfc_version())
+
+    def test_030_computer(self):
+        params = {
+            "name": get_mfc_computer_name(),
+            "mac_address": get_first_mac()
+        }
+        self.request('GET', 'computers', {}, params)
+        self.check_status_ok()
+        self.check_true(self.count() == 1)
+        id=json.loads(self.body)["results"][0]["id"]
+        
+        self.request('GET', 'computers/%s/' % id)
+        self.check_status_ok()
+        self.check_field_equal("name", get_mfc_computer_name())
+        self.check_field_equal("uuid", get_hardware_uuid())
+        self.check_field_equal("mac_address", get_first_mac())
+
+    def test_040_check_migration(self):
+        self.request('GET', 'migrations/%s/' % 1)
+        self.check_status_ok()
+        self.check_field_equal("computer",
+            {"id": 1, "cid_description": get_mfc_computer_name()}
+        )
+
+    # TODO updates
+    # TODO Login
+
+    def test_060_check_attribute(self):
+        self.request('GET', 'attributes')
+        self.check_status_ok()
+        self.check_true(self.count() > 1)
+
+    def test_080_check_user(self):
+        self.request('GET', 'users/%s/' % 1)
+        self.check_status_ok()
+        self.check_field_equal("name", "root")
+
+    def test_100_check_store(self):
+        self.request('GET', 'stores/%s/' % 1)
+        self.check_status_ok()
+        self.check_field_equal("name", "org")
+
+    def test_110_check_package(self):
+        self.request('GET', 'packages/%s/' % 1)
+        self.check_status_ok()
+        self.check_field_in("name", "migasfree-launcher")
+
+    def test_110_check_repository(self):
+        self.request('GET', 'repositories/%s/' % 1)
+        self.check_status_ok()
+        self.check_field_equal("name", "test")
+        self.check_field_equal("version", {"id": 1, "name": get_mfc_version()})
+
+
+class _30_Unit(TokenApi):
     """
     Test migasfree Token API
     """
 
-    def test_change_status(self):
+    def test_010_change_status(self):
+
+        # Change status to reserved
         data = {"status": "reserved"}
-        status, body = self.request('POST', 'computers/1/status', data)
-        self.check_status_ok(status, body)
+        self.request('POST', 'computers/%s/status/' % 1, data)
+        self.check_status_ok()
 
-    def test_cid(self):
-        data = {
-            "name": get_mfc_computer_name(),
-            "mac_address": get_first_mac()
-        }
-        data = urllib.urlencode(data)
-        status, body = self.request('GET', 'computers', data)
-        self.check_status_ok(status, body)
-        self.check_field_equal(body, "name", get_mfc_computer_name())
-        self.check_field_equal(body, "uuid", get_hardware_uuid())
+        self.request('GET', 'computers/%s/' % 1)
+        self.check_status_ok()
+        self.check_field_equal("status", "reserved")
 
-    def test_check_package(self):
-        status, body = self.request('GET', 'packages', {"id": 1})
-        self.check_status_ok(status, body)
-        self.check_field_in(body, "name", "migasfree-launcher")
+
+class _40_Permissions(TokenApi):
+    """
+    Test migasfree Token API
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.user = "reader"
+        self.password = "reader"
+        super(TokenApi,self).__init__(*args, **kwargs)
+
+    def test_010_change_status_forbidden(self):
+
+        # Change status to reserved
+        data = {"status": "intended"}
+        self.request('POST', 'computers/%s/status/' % 1, data)
+        self.check_status_forbidden()
+        # Check status is not changed
+        self.request('GET', 'computers/%s/' % 1)
+        self.check_status_ok()
+        self.check_field_equal("status", "reserved")
 
 
 if __name__ == '__main__':
