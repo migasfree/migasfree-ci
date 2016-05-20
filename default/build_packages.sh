@@ -104,6 +104,11 @@ function build_dependences()
     build_pkg marcgibbons django-rest-swagger 0.3.6
     build_pkg_with_pip carltongibson django-filter 0.13.0 '[DEFAULT]\nProvides: django-filter\n'
 
+    # for migasfree-client 5 REST-API requery packages
+    # ================================================
+    # build_pkg_with_pip mpdavis jose 1.0.0 '[DEFAULT]\nPackage: python-jose\n'
+    # build_pkg sigmavirus24 requests-toolbelt 0.6.2
+    # build_pkg_with_pip kennethreitz requests 2.4.3
 
     # python-diff-match-patch requerido por python-django-import-export
     if ! [ -f $_TARGET_PATH/dists/$_VERSION/PKGS/python-diff-match-patch_20121119-1_all.deb ]
