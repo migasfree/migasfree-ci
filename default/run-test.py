@@ -225,9 +225,9 @@ class _20_check_integrity_data(TokenApi):
         self.request('GET', 'computers', {}, params)
         self.check_status_ok()
         self.check_true(self.count() == 1)
-        id=json.loads(self.body)["results"][0]["id"]
-        
-        self.request('GET', 'computers/%s/' % id)
+        cid = json.loads(self.body)["results"][0]["id"]
+
+        self.request('GET', 'computers/%s/' % cid)
         self.check_status_ok()
         self.check_field_equal("name", get_mfc_computer_name())
         self.check_field_equal("uuid", get_hardware_uuid())
@@ -295,7 +295,7 @@ class _40_Permissions(TokenApi):
     def __init__(self, *args, **kwargs):
         self.user = "reader"
         self.password = "reader"
-        super(TokenApi,self).__init__(*args, **kwargs)
+        super(TokenApi, self).__init__(*args, **kwargs)
 
     def test_010_change_status_forbidden(self):
 
