@@ -5,8 +5,8 @@ echo "deb file:///pub wheezy PKGS" > /etc/apt/sources.list.d/local.list
 
 apt-key list
 apt-get update
-apt-get -y install --no-install-recommends migasfree-client
-apt-get -y install --no-install-recommends migasfree-server
+apt-get -y install migasfree-client
+apt-get -y install migasfree-server
 
 cat > /etc/migasfree.conf <<EOF
 [client]
