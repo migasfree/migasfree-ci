@@ -193,6 +193,28 @@ rm $_LAUNCHER
            """
         self.check_equal(os.system(cmd), 0)
 
+    def test_050_launcher_pre_post_run(self):
+        cmd = """
+           mkdir -p /usr/share/migasfree-launcher/prerun.d/
+           mkdir -p /usr/share/migasfree-launcher/postrun.d/
+           echo "touch /var/tmp/migasfree-launcher-prerun" > /usr/share/migasfree-launcher/prerun.d/test_050_launcher.sh
+           echo "touch /var/tmp/migasfree-launcher-postrun" > /usr/share/migasfree-launcher/postrun.d/test_050_launcher.sh
+           migasfree-launcher force-upgrade
+           """
+        self.check_equal(os.system(cmd), 0)
+
+        cmd = """
+           ls /var/tmp/migasfree-launcher-prerun > /dev/null
+           """
+        self.check_equal(os.system(cmd), 0)
+
+
+        cmd = """
+           ls /var/tmp/migasfree-launcher-postrun > /dev/null
+           """
+        self.check_equal(os.system(cmd), 0)
+
+
     def test_900_migasfree_label(self):
         config = get_config(client_settings.CONF_FILE, 'client')
         self.uuid = get_hardware_uuid()
