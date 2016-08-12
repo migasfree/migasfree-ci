@@ -163,7 +163,7 @@ class _10_Integrity(TokenApi):
     def test_020_migasfree_upload(self):
         cmd = """
 wget -O - http://migasfree.org/pub/gpg_key | apt-key add -
-echo "deb http://migasfree.org/pub wheezy PKGS" > /etc/apt/sources.list.d/migasfree.list
+echo "deb http://migasfree.org/pub stable PKGS" > /etc/apt/sources.list.d/migasfree.list
 apt-get update
 apt-get download migasfree-launcher
 _LAUNCHER=$(ls migasfree-launcher*.deb)

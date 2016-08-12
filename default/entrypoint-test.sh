@@ -1,7 +1,7 @@
 #!/bin/bash
 
 apt-key add /pub/gpg_key
-echo "deb file:///pub wheezy PKGS" > /etc/apt/sources.list.d/local.list
+echo "deb file:///pub stable PKGS" > /etc/apt/sources.list.d/local.list
 
 apt-key list
 apt-get update
