@@ -1,7 +1,7 @@
 #!/bin/bash
 set -x
 
-_VERSION=wheezy
+_VERSION=stable
 _ARCH="i386 amd64 armel armhf"
 
 
@@ -15,9 +15,19 @@ function build_pkg_with_pip()
     if ! [ -f /pub/dists/$_VERSION/PKGS/python-${_REPO}_$_RELEASE*_all.deb ]
     then
         pip install $_REPO==$_RELEASE  --download="."
-        tar -xvf $_REPO-$_RELEASE.tar.gz
-        rm $_REPO-$_RELEASE.tar.gz
-        cd  $_REPO-$_RELEASE
+
+        if [ -f  $_REPO-$_RELEASE.zip ]; then
+            unzip $_REPO-$_RELEASE.zip
+            rm $_REPO-$_RELEASE.zip
+            cd $_REPO-$_RELEASE
+        fi
+
+        if [ -f  $_REPO-$_RELEASE.tar.gz ]; then
+            tar -xvf $_REPO-$_RELEASE.tar.gz
+            rm $_REPO-$_RELEASE.tar.gz
+            cd  $_REPO-$_RELEASE
+        fi
+
         if [ -f setup.py ]
         then
 
@@ -33,7 +43,7 @@ function build_pkg_with_pip()
             rm -rf ../$_REPO*
         fi
         cd ..
-        cp  $_REPO-$_RELEASE/deb_dist/*_all.deb /pub/dists/$_VERSION/PKGS
+        cp  $_REPO-$_RELEASE/deb_dist/*.deb /pub/dists/$_VERSION/PKGS
         rm -rf $_REPO-$_RELEASE
     fi
 }
@@ -89,20 +99,32 @@ function build_dependences()
 
     cd $_TARGET_PATH/dists/$_VERSION/PKGS/
 
-    # migasfree_4.11-1 requery packages
+    # migasfree_4.12-1 requery packages
     build_pkg_with_pip yourlabs django-autocomplete-light 3.1.1
     build_pkg crucialfelix django-ajax-selects 1.4.2
-    build_pkg django django 1.9.6
+    build_pkg django django 1.9.8
     build_pkg dyve django-bootstrap3 6.2.2
     build_pkg django-admin-bootstrapped django-admin-bootstrapped 2.5.7
-    build_pkg django-import-export django-import-export 0.4.0
-    build_pkg kelp404 six 1.10.0
+    build_pkg django-import-export django-import-export 0.4.5
+    build_pkg_with_pip kelp404 six 1.10.0
+
     build_pkg_with_pip kennethreitz tablib 0.9.11
 
-    build_pkg tomchristie django-rest-framework 3.3.3
+    build_pkg tomchristie django-rest-framework 3.4.0
     build_pkg philipn django-rest-framework-filters 0.8.0
-    build_pkg marcgibbons django-rest-swagger 0.3.6
-    build_pkg_with_pip carltongibson django-filter 0.13.0 '[DEFAULT]\nProvides: django-filter\n'
+    build_pkg marcgibbons django-rest-swagger 0.3.10
+    build_pkg carltongibson django-filter 0.13.0 '[DEFAULT]\nProvides: django-filter\n'
+
+
+    apt-get update
+    apt-get --force-yes --assume-yes install libxml2 libxml2-dev libxslt-dev
+
+
+    build_pkg_with_pip adi- django-markdownx 1.6
+    build_pkg_with_pip Kozea pygal 2.2.3
+    build_pkg_with_pip carljm django-form-utils 1.0.3 '[DEFAULT]\nProvides: django-form-utils\n'
+
+
 
     # for migasfree-client 5 REST-API requery packages
     # ================================================
@@ -110,11 +132,16 @@ function build_dependences()
     # build_pkg sigmavirus24 requests-toolbelt 0.6.2
     # build_pkg_with_pip kennethreitz requests 2.4.3
 
+
+
+    cd $_TARGET_PATH/dists/$_VERSION/PKGS/  
+
     # python-diff-match-patch requerido por python-django-import-export
     if ! [ -f $_TARGET_PATH/dists/$_VERSION/PKGS/python-diff-match-patch_20121119-1_all.deb ]
     then
         wget http://mirrors.kernel.org/ubuntu/pool/universe/p/python-diff-match-patch/python-diff-match-patch_20121119-1_all.deb
     fi
+
     # Ponemos la version minima de lshw en el repositorio
 
     for _arch in $_ARCH
@@ -124,7 +151,6 @@ function build_dependences()
             wget http://ftp.debian.org/debian/pool/main/l/lshw/lshw_02.16-1_$_arch.deb
         fi
     done
-
 
     cd $_TARGET_PATH
 
@@ -246,7 +272,7 @@ EOF
 #    wget -O - http://migasfree.org/pub/install-server | bash
 
 wget -O - http://migasfree.org/pub/gpg_key | apt-key add -
-echo "deb http://migasfree.org/pub wheezy PKGS" > /etc/apt/sources.list.d/migasfree.list
+echo "deb http://migasfree.org/pub $_VERSION PKGS" > /etc/apt/sources.list.d/migasfree.list
 apt-get update
 apt-get -y install --no-install-recommends migasfree-server
 EOF
@@ -257,7 +283,7 @@ EOF
 #    wget -O - http://migasfree.org/pub/install-client | bash
 
 wget -O - http://migasfree.org/pub/gpg_key | apt-key add -
-echo "deb http://migasfree.org/pub wheezy PKGS" > /etc/apt/sources.list.d/migasfree.list
+echo "deb http://migasfree.org/pub $_VERSION PKGS" > /etc/apt/sources.list.d/migasfree.list
 apt-get update
 apt-get -y install --no-install-recommends migasfree-client
 EOF
