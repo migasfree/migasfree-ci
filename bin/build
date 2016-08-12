@@ -8,7 +8,7 @@ else
     _VOLUME_GIT="-v $_GIT:/git"
 fi
 
-_BUILD_FROM="ubuntu:trusty"
+_BUILD_FROM="ubuntu:precise"
 _BUILD_DISTRO=$(echo "$_BUILD_FROM" | awk -F: '{print $2}')
 
 _PATH_LOG=logs
