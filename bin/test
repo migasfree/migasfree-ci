@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z $_TEST_FROM ] ; then
-    _TEST_FROM="ubuntu:precise ubuntu:trusty ubuntu:xenial debian:wheezy debian:jessie debian:stretch"
+    _TEST_FROM="ubuntu:trusty ubuntu:xenial debian:jessie debian:stretch"
 fi
 
 _PATH_LOG=logs
