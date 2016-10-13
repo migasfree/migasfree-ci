@@ -134,7 +134,7 @@ function build_dependences()
 
 
 
-    cd $_TARGET_PATH/dists/$_VERSION/PKGS/  
+    cd $_TARGET_PATH/dists/$_VERSION/PKGS/
 
     # python-diff-match-patch requerido por python-django-import-export
     if ! [ -f $_TARGET_PATH/dists/$_VERSION/PKGS/python-diff-match-patch_20121119-1_all.deb ]
@@ -194,7 +194,7 @@ function build_repo_metadata()
 {
     local _TARGET_PATH=$1
     local _KEYS_PATH=/var/lib/migasfree.org/keys/.gnupg
-
+    local _KEY_NAME=migasfree.org_pub
 
 
 
@@ -254,15 +254,15 @@ EOF
 
     apt-ftparchive -c apt-release.conf release dists/$_VERSION > dists/$_VERSION/Release
 
-    gpg -u migasfree-repository --homedir $_KEYS_PATH -abs -o dists/$_VERSION/Release.gpg dists/$_VERSION/Release
+    gpg -u $_KEY_NAME --homedir $_KEYS_PATH -abs -o dists/$_VERSION/Release.gpg dists/$_VERSION/Release
 
-    gpg -u migasfree-repository --homedir $_KEYS_PATH --clearsign -o dists/$_VERSION/InRelease dists/$_VERSION/Release
+    gpg -u $_KEY_NAME --homedir $_KEYS_PATH --clearsign -o dists/$_VERSION/InRelease dists/$_VERSION/Release
     rm -rf apt-release.conf apt-ftparchive.conf
 
     ls -la $_TARGET_PATH/dists/$_VERSION/PKGS
 
-    # copy migasfree-repositories public key
-    cp $_KEYS_PATH/migasfree-repository.gpg $_TARGET_PATH/gpg_key
+    # copy migasfree.org_pub public key
+    cp $_KEYS_PATH/$_KEY_NAME.gpg $_TARGET_PATH/gpg_key
     chmod 444 $_TARGET_PATH/gpg_key
 
     rm -rf $_TARGET_PATH/.cache ||:
