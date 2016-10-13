@@ -111,7 +111,7 @@ function build_dependences()
     build_pkg_with_pip kennethreitz tablib 0.9.11
 
     build_pkg tomchristie django-rest-framework 3.4.0
-    build_pkg philipn django-rest-framework-filters 0.8.0
+    build_pkg philipn django-rest-framework-filters v0.8.0
     build_pkg marcgibbons django-rest-swagger 0.3.10
     build_pkg carltongibson django-filter 0.13.0 '[DEFAULT]\nProvides: django-filter\n'
 
