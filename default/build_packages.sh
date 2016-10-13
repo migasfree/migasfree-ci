@@ -178,6 +178,7 @@ function build_migasfree_suite()
 
     if [ -d /git/migasfree-launcher ]
     then
+        rm -rf /git/migasfree-launcher/deb_dist || :   
         cd /git/migasfree-launcher/
         python setup.py --command-packages=stdeb.command bdist_deb
         cp deb_dist/*_all.deb /pub/dists/$_VERSION/PKGS
