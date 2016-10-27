@@ -105,7 +105,7 @@ function build_dependences()
     build_pkg django django 1.9.8
     build_pkg dyve django-bootstrap3 6.2.2
     build_pkg django-admin-bootstrapped django-admin-bootstrapped 2.5.7
-    build_pkg django-import-export django-import-export 0.4.5
+    build_pkg django-import-export django-import-export 0.4.2
     build_pkg_with_pip kelp404 six 1.10.0
 
     build_pkg_with_pip kennethreitz tablib 0.9.11
@@ -178,7 +178,7 @@ function build_migasfree_suite()
 
     if [ -d /git/migasfree-launcher ]
     then
-        rm -rf /git/migasfree-launcher/deb_dist || :   
+        rm -rf /git/migasfree-launcher/deb_dist || :
         cd /git/migasfree-launcher/
         python setup.py --command-packages=stdeb.command bdist_deb
         cp deb_dist/*_all.deb /pub/dists/$_VERSION/PKGS
