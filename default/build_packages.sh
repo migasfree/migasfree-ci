@@ -113,8 +113,6 @@ function build_dependences()
     build_pkg tomchristie django-rest-framework 3.4.0
     build_pkg philipn django-rest-framework-filters v0.8.0
     build_pkg marcgibbons django-rest-swagger 0.3.10
-    build_pkg carltongibson django-filter 0.13.0 '[DEFAULT]\nProvides: django-filter\n'
-
 
     apt-get update
     apt-get --force-yes --assume-yes install libxml2 libxml2-dev libxslt-dev
@@ -141,6 +139,21 @@ function build_dependences()
     then
         wget http://mirrors.kernel.org/ubuntu/pool/universe/p/python-diff-match-patch/python-diff-match-patch_20121119-1_all.deb
     fi
+
+
+
+    # transitional package python-django-filters_0.13.0
+    if ! [ -f $_TARGET_PATH/dists/$_VERSION/PKGS/python-django-filters_0.13.0-1_all.deb ]
+    then
+        wget http://ftp.de.debian.org/debian/pool/main/d/django-filter/python-django-filters_0.13.0-1_all.deb
+    fi
+
+    if ! [ -f $_TARGET_PATH/dists/$_VERSION/PKGS/django-filter_0.13.0-1_all.deb ]
+    then
+        wget http://ftp.de.debian.org/debian/pool/main/d/django-filter/django-filter_0.13.0-1_all.deb
+    fi
+
+
 
     # Ponemos la version minima de lshw en el repositorio
 
