@@ -7,6 +7,10 @@ ENV TERM=xterm \
     LANGUAGE=en_US
 
 RUN apt-get update && \
+    rm -r /var/cache/apt /var/lib/apt/lists && \
+    mkdir -p /var/lib/apt/lists/partial && \
+    sed --in-place "s/httpredir.debian.org/softlibre.unizar.es/g" /etc/apt/sources.list && \
+    apt-get update && \
     # Setup locales && \
     echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && \
     echo "LC_ALL=en_US.UTF-8" >> /etc/default/locale && \
