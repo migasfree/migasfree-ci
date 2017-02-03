@@ -302,5 +302,15 @@ apt-get update
 apt-get -y install --no-install-recommends migasfree-client
 EOF
 
+    # Install Launcher Script
+    cat > $_TARGET_PATH/install-launcher <<EOF
+# To install migasfree-launcher execute:
+#    wget -O - http://migasfree.org/pub/install-launcher | bash
+
+wget -O - http://migasfree.org/pub/gpg_key | apt-key add -
+echo "deb http://migasfree.org/pub $_VERSION PKGS" > /etc/apt/sources.list.d/migasfree.list
+apt-get update
+apt-get -y install --no-install-recommends migasfree-launcher
+EOF
 
 }
