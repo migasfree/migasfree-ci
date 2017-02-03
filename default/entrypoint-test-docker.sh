@@ -1,9 +1,13 @@
 #!/bin/bash
 
+apt-get update
+apt-get -y install gnupg2
+
 apt-key add /pub/gpg_key
 echo "deb file:///pub stable PKGS" > /etc/apt/sources.list.d/local.list
 
 apt-key list
+
 apt-get update
 apt-get -y install --no-install-recommends migasfree-client
 
